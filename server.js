@@ -1,4 +1,7 @@
-// server.js
+// Heath Scherich
+// Source:  https://www.codetutorial.io/nodejs-socket-io-and-jhonny-five-to-control-arduino/
+// index.html rewritten and server.js heavily editted
+
 var express        = require('express');
 var app            = express();
 var httpServer = require("http").createServer(app);
@@ -78,12 +81,10 @@ io.on('connection', function (socket) {
     var towerHeight;
     function tower(step){
         if(pressed){
-            console.log(step + '||' + towerHeight);
             if(step == towerHeight-1){
                 towerHeight++;
-                console.log(towerHeight + '!!' + ledArraySize);
             } else {    //you lose
-                console.log('reset');
+                socket.emit('score', towerHeight);
                 towerHeight = 1;
             }
             return;
@@ -91,7 +92,7 @@ io.on('connection', function (socket) {
             return;
         }
 
-        pause = 50*(ledArraySize-towerHeight + 3);
+        pause = 50*(ledArraySize-towerHeight);
         for(var i=0; i<towerHeight; i++){
             leds[i].on();
         }
@@ -119,7 +120,6 @@ io.on('connection', function (socket) {
     * Event which triggers the Blue Devil game
     */
     socket.on('start:bluedev', function(){
-        // Register listeners
         button.on("press", function(){
             if(pressed == true){ return; }
             pressed = true;
@@ -143,7 +143,7 @@ io.on('connection', function (socket) {
         button.on('press', function(){
             if(pressed == true){ return; }
             pressed = true;
-            if(towerHeight != ledArraySize){
+            if(towerHeight != ledArraySize-1){
                 board.wait(2000, function(){
                     for(var i=ledArraySize; i>=towerHeight; i--){
                         leds[i].off();
@@ -152,41 +152,30 @@ io.on('connection', function (socket) {
                     tower(ledArraySize);
                 });
             } else {    // WINNER
-                console.log('how am i here');
                 board.wait(250, function(){
                     leds[ledArraySize].on();
-                    leds.strobe(1000, function(){
-                        console.log('strobe1 working');
-                        board.wait(100, function(){
-                            leds.stop();
-                            leds.off();
-                        });
+                    leds.strobe(500);
+                    board.wait(4000, function(){
+                        leds.stop();
+                        leds.off();
                     });
-                    board.wait(1100, function(){
-                        leds.strobe(1000, function(){
-                            console.log('strobe2 working');
-                            board.wait(100, function(){
-                                leds.stop();
-                                leds.off();
-                            });
-                            towerHeight = 1;
-                            pressed = false;
-                            tower(ledArraySize);
-                        });
-                    });
+                    pressed = false;
+                    socket.emit('gameover');
                 });
             }
         });
 
         endgame = false;
-        towerHeight = ledArraySize-1;
+        towerHeight = 1;
         tower(ledArraySize);
     });
     /**
     * Ends the current playing game
     */
-    socket.on('stop', function(game){
-        //button.removeEventListener("press", function(){}     )
+    socket.on('stop', function(){
+        if(button._events){
+            button._events.press = null;    // hax
+        }
         endgame = true;
         leds.off();
     })

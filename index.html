@@ -1,6 +1,3 @@
-<!-- NOTE: SOURCE IS FROM:
-    https://www.codetutorial.io/nodejs-socket-io-and-jhonny-five-to-control-arduino/
--->
 <!DOCTYPE html>
 <html lang="en" ng-app="myApp" class="no-js"> <!--<![endif]-->
 <head>
@@ -22,12 +19,12 @@
         <div style="font-size: 60px; font-weight: bold" flex>Arduino Arcade</div>
         <div layout="column" style="border-radius: 10px; border: 2px solid; width: 100%" flex>
             <div layout="row">
-                <md-button class="gameSelect" ng-click="setDescription(game)" ng-repeat="game in games">{{game.name}}</md-button>
+                <md-button class="gameSelect" ng-click="setCurrentGame(game)" ng-repeat="game in games">{{game.name}}</md-button>
             </div>
-            <div ng-if="description" class="gameDescr" layout="row" layout-align="center center">
-                <div>{{description}}</div>
-                <md-button class="md-raised md-primary md-hue-1" ng-click="startGame(description)" ng-if="!inProgress">Game Start</md-button>
-                <md-button class="md-raised md-warn" ng-click="stopGame(description)" ng-if="inProgress">Game Stop</md-button>
+            <div ng-if="currGame.description" class="gameDescr" layout="row" layout-align="center center">
+                <div>{{currGame.description}}</div>
+                <md-button class="md-raised md-primary md-hue-1" ng-click="startGame()" ng-if="!inProgress">Game Start</md-button>
+                <md-button class="md-raised md-warn" ng-click="stopGame()" ng-if="inProgress">Game Stop</md-button>
             </div>
         </div>
     </div>
@@ -84,11 +81,18 @@
 
         /**
         * Values returned from the Arduino in server.js
-        * @var pos Position in the light-strand
+        * @var value Score achieved in any game
         */
         mySocket.on('score', function(value){
             $scope.score = value;
-        })
+        });
+
+        /**
+        * Message to update the DOM so a new game can start
+        */
+        mySocket.on('gameover', function(){
+            $scope.inProgress = false;
+        });
 
         /**
         * Implementing logic that orders the names of players on the scoreboard
@@ -117,32 +121,24 @@
         * Message to the server.js which starts the arcade game
         * The Arduino application in server.js is a work in progress
         */
-        $scope.startGame = function(desc){
+        $scope.startGame = function(){
             $scope.inProgress = true;
-            for(var i in $scope.games){
-                if($scope.games[i].description == desc){
-                    mySocket.emit('start:' + $scope.games[i].code);
-                }
-            }
+            mySocket.emit('start:' + $scope.currGame.code);
         };
 
         /**
         * All Leds turn off
         */
-        $scope.stopGame = function(desc){
+        $scope.stopGame = function(){
             $scope.inProgress = false;
-            for(var i in $scope.games){
-                if($scope.games[i].description == desc){
-                    mySocket.emit('stop', $scope.games[i].code);
-                }
-            }
+            mySocket.emit('stop');
         };
 
         /**
         * Sets description in the GUI
         */
-        $scope.setDescription = function(game){
-            $scope.description = game.description;
+        $scope.setCurrentGame = function(game){
+            $scope.currGame = game;
         };
 
         /**
