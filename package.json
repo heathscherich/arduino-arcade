@@ -1,0 +1,14 @@
+{
+    "name": "arduino-arcade",
+    "description": "Web application that is played with a node.js based Arduino",
+    "author": "Heath Scherich",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/smittenbaguetten/arduino-arcade"
+    },
+    "dependencies": {
+        "express": "~4.13.4",
+        "johnny-five": "~0.9.43",
+        "socket.io": "~1.4.5"
+    }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "arduino-arcade",
+  "description": "Web application that is played with a node.js based Arduino",
+  "authors": "Heath Scherich",
+  "homepage": "https://github.com/smittenbaguetten/arduino-arcade",
+  "dependencies": {
+    "angular-socket-io": "^0.7.0",
+    "angular-material": "^1.0.7",
+    "angular": "angularjs#^1.5.5",
+    "socket.io-client": "^1.4.5"
+  }
+}
