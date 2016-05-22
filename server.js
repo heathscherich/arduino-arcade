@@ -2,14 +2,13 @@
 // Source:  https://www.codetutorial.io/nodejs-socket-io-and-jhonny-five-to-control-arduino/
 // index.html rewritten and server.js heavily editted
 
-var express        = require('express');
-var app            = express();
-var httpServer = require("http").createServer(app);
-var five = require("johnny-five");
-var io = require('socket.io')(httpServer);
+var express = require('express');
 
-
-var port = 3000;
+const app = express(),
+    httpServer = require("http").createServer(app),
+    five = require("johnny-five"),
+    io = require('socket.io')(httpServer),
+    port = 3000;
 
 app.use(express.static(__dirname + '/'));
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="myApp" class="no-js"> <!--<![endif]-->
+<html lang="en" ng-app="myApp" class="no-js">
 <head>
   <title>Arduino Page</title>
 </head>
@@ -39,8 +39,11 @@
 
     <div style="margin-bottom: 64px; width: 512px" layout="column" layout-align="center">
         <div class="md-display-3" style="font-weight: bold; text-decoration: underline; text-align: center">Scoreboard</div>
-        <div class="md-display-2" ng-repeat="player in players" layout="row" layout-align="space-between">
+        <div class="md-display-2" style="padding-left: 8px; padding-right: 8px;" ng-repeat="player in players" layout="row" layout-align="space-between">
             <div>{{player.name}}</div><div>{{player.score}}</div>
+        </div>
+        <div>
+            <md-button ng-if="players.length" ng-click="clearScoreboard()" class="md-raised md-warn">Reset</md-button>
         </div>
     </div>
 </md-card>
@@ -98,6 +101,7 @@
 
         /**
         * Implementing logic that orders the names of players on the scoreboard
+        * @var newPlayer Name of player submitting a score
         * @return players Sorted players object with name and score
         */
         function getPlayers(newPlayer){
@@ -109,7 +113,7 @@
                         notfound = false;
                     }
                 }
-                if(notfound){
+                if(notfound && $scope.score){
                     $scope.currGame.players.push({'name': newPlayer, 'score': $scope.score});
                 }
             }
@@ -123,8 +127,21 @@
         }
 
         /**
+        * Clears Array .players in various objects
+        */
+        $scope.clearScoreboard = function(){
+            $scope.players = [];
+            localStorage.removeItem("players:" + $scope.currGame.code);
+            for(game in $scope.games){
+                if(game == $scope.currGame){
+                    games[game].players = [];
+                    $scope.currGame.players = [];
+                }
+            }
+        };
+
+        /**
         * Message to the server.js which starts the arcade game
-        * The Arduino application in server.js is a work in progress
         */
         $scope.startGame = function(){
             $scope.inProgress = true;
@@ -140,7 +157,7 @@
         };
 
         /**
-        * Sets description in the GUI
+        * Sets the currGame in $scope
         */
         $scope.setCurrentGame = function(game){
             $scope.currGame = game;
@@ -148,14 +165,28 @@
         };
 
         /**
-        * Function that records player's name to the scoreboard
+        * Function that records player's info to the scoreboard
         * @string playerName Entered in the application input field
         */
         $scope.submit = function(playerName) {
             if(!playerName){ return; }
             $scope.players = getPlayers(playerName);
+            for(var i in $scope.games){
+                if($scope.games[i].players.length){
+                    localStorage.setItem("players:" + $scope.games[i].code, JSON.stringify($scope.games[i].players));
+                }
+            }
             $scope.score = undefined;
         };
+
+        // Runs immediately at pageload
+        // Sets scoreboard and resets Arduino
+        for(var i in $scope.games){
+            if(localStorage.getItem("players:" + $scope.games[i].code)){
+                $scope.games[i].players = JSON.parse(localStorage.getItem("players:" + $scope.games[i].code));
+            }
+        }
+        $scope.stopGame();
 });
 
 </script>
