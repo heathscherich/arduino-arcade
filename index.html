@@ -73,16 +73,16 @@
         var name, score;
         $scope.games = [{ name: 'Blue Devil',
                             code: 'bluedev',
-                            description: "Try and stop the blue light while it's blinking",
+                            description: "Use the button to stop the blue light while it's blinking",
                             players: [] },
                         { name: 'Light Tower',
                             code: 'tower',
-                            description: "Build the tower by catching lights that drop on it",
-                            players: [] },
+                            description: "Build the tower by stopping lights that drop on it",
+                            players: [] }/*,
                         { name: 'Flip Flop',
                             code: 'flipflop',
                             description: "Illuminate all the lights to get the fastest time",
-                            players: [] } ];
+                            players: [] }*/ ];
 
         /**
         * Values returned from the Arduino in server.js
@@ -132,9 +132,9 @@
         $scope.clearScoreboard = function(){
             $scope.players = [];
             localStorage.removeItem("players:" + $scope.currGame.code);
-            for(game in $scope.games){
-                if(game == $scope.currGame){
-                    games[game].players = [];
+            for(var i in $scope.games){
+                if($scope.games[i] == $scope.currGame){
+                    $scope.games[game].players = [];
                     $scope.currGame.players = [];
                 }
             }
