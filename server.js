@@ -48,7 +48,7 @@ io.on('connection', function (socket) {
             return;
         }
 
-        pause = 45*(Math.abs(ledArraySize/2-step)+1);
+        pause = 50*(Math.abs(ledArraySize/2-step));
         if(leds[step-1]){
             leds[step-1].off();
         }
