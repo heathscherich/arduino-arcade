@@ -8,4 +8,4 @@ Next, connect your microcontroller and wire the breadboard as shown in the diagr
 
 Finally, start the server with `node server.js` and point your web browser at localhost:3000
 
-[[https://github.com/smittenbaguetten/arduino-arcade/blob/master/img/arduino-circuit.png|alt=arduino-circuit]]
+[Arduino Circuit](img/arduino-circuit.PNG)
